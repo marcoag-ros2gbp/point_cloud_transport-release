@@ -47,7 +47,7 @@ namespace point_cloud_transport
 {
 
 //! Base class for plugins to Publisher.
-class POINT_CLOUD_TRANSPORT_PUBLIC PublisherPlugin
+class PublisherPlugin
 {
 public:
   /// \brief Result of cloud encoding. Either an holding the compressed cloud,
@@ -59,10 +59,13 @@ public:
   PublisherPlugin(const PublisherPlugin &) = delete;
   PublisherPlugin & operator=(const PublisherPlugin &) = delete;
 
+  virtual ~PublisherPlugin() {}
+
   //! Get a string identifier for the transport provided by this plugin
   virtual std::string getTransportName() const = 0;
 
   //! \brief Advertise a topic, simple version.
+  POINT_CLOUD_TRANSPORT_PUBLIC
   void advertise(
     std::shared_ptr<rclcpp::Node> node,
     const std::string & base_topic,
@@ -83,13 +86,15 @@ public:
   /// \return The output EncodeResult holding the compressed cloud message (if encoding succeeds),
   /// or an error message.
   ///
-  virtual EncodeResult encode(const sensor_msgs::msg::PointCloud2 & raw) const;
+  POINT_CLOUD_TRANSPORT_PUBLIC
+  virtual EncodeResult encode(const sensor_msgs::msg::PointCloud2 & raw) const = 0;
 
   //! Publish a point cloud using the transport associated with this PublisherPlugin.
   virtual void publish(const sensor_msgs::msg::PointCloud2 & message) const = 0;
 
   //! Publish a point cloud using the transport associated with this PublisherPlugin.
-  virtual void publish(const sensor_msgs::msg::PointCloud2::ConstSharedPtr & message) const;
+  POINT_CLOUD_TRANSPORT_PUBLIC
+  virtual void publishPtr(const sensor_msgs::msg::PointCloud2::ConstSharedPtr & message) const;
 
   //! Shutdown any advertisements associated with this PublisherPlugin.
   virtual void shutdown() = 0;
@@ -100,6 +105,7 @@ public:
   virtual std::string getTopicToAdvertise(const std::string & base_topic) const = 0;
 
   //! Return the lookup name of the PublisherPlugin associated with a specific transport identifier.
+  POINT_CLOUD_TRANSPORT_PUBLIC
   static std::string getLookupName(const std::string & transport_name);
 
 protected:
